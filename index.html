@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tony Vierra | Robotics + Embedded Portfolio</title>
+  <meta name="description" content="Tony Vierra — EE @ UCLA. Robotics, embedded systems, computer vision, simulation, and hands-on debugging." />
+
+  <style>
+    :root{
+      --bg: #0b0f17;
+      --panel: rgba(255,255,255,0.06);
+      --panel2: rgba(255,255,255,0.10);
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.70);
+      --muted2: rgba(255,255,255,0.55);
+      --border: rgba(255,255,255,0.10);
+      --accent: #7c5cff; /* purple */
+      --accent2:#21c7a8; /* teal */
+      --warn:#ffce54;
+      --ok:#38d996;
+      --shadow: 0 18px 50px rgba(0,0,0,0.35);
+      --radius: 18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+
+    [data-theme="light"]{
+      --bg: #f6f7fb;
+      --panel: rgba(0,0,0,0.04);
+      --panel2: rgba(0,0,0,0.06);
+      --text: rgba(0,0,0,0.86);
+      --muted: rgba(0,0,0,0.65);
+      --muted2: rgba(0,0,0,0.55);
+      --border: rgba(0,0,0,0.10);
+      --shadow: 0 18px 50px rgba(0,0,0,0.12);
+    }
+
+    *{ box-sizing:border-box; }
+    html, body{ height:100%; }
+    body{
+      margin:0;
+      font-family: var(--sans);
+      color: var(--text);
+      background: var(--bg);
+      overflow-x:hidden;
+    }
+
+    a{ color: inherit; }
+    a:hover{ opacity:0.92; }
+
+    /* Background visuals */
+    .bg-wrap{
+      position:fixed;
+      inset:0;
+      z-index:-1;
+      overflow:hidden;
+    }
+    .grid{
+      position:absolute;
+      inset:-40% -40%;
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px);
+      background-size: 72px 72px;
+      transform: rotate(-10deg);
+      opacity:0.25;
+      filter: blur(0.2px);
+      pointer-events:none;
+    }
+    .blob{
+      position:absolute;
+      width: 560px;
+      height: 560px;
+      border-radius: 50%;
+      filter: blur(40px);
+      opacity:0.55;
+      animation: float 12s ease-in-out infinite;
+      pointer-events:none;
+    }
+    .blob.one{
+      background: radial-gradient(circle at 30% 30%, var(--accent), transparent 60%);
+      top:-160px;
+      left:-120px;
+    }
+    .blob.two{
+      background: radial-gradient(circle at 60% 40%, var(--accent2), transparent 60%);
+      bottom:-220px;
+      right:-180px;
+      animation-delay: -4s;
+    }
+    @keyframes float{
+      0%,100% { transform: translate(0,0) scale(1); }
+      50% { transform: translate(18px, -22px) scale(1.03); }
+    }
+
+    /* Layout */
+    .container{
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 18px 80px;
+    }
+
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding: 10px 0 20px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width: 220px;
+    }
+
+    .logo{
+      width:44px;height:44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(124,92,255,0.95), rgba(33,199,168,0.95));
+      box-shadow: var(--shadow);
+      display:grid;
+      place-items:center;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,0.25);
+    }
+
+    .logo svg{ opacity:0.95; }
+
+    .brand h1{
+      font-size: 18px;
+      margin:0;
+      letter-spacing:0.2px;
+    }
+    .brand p{
+      margin:2px 0 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .btn{
+      border:1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 14px;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      box-shadow: none;
+      transition: transform 0.08s ease, background 0.2s ease, border 0.2s ease;
+      user-select:none;
+      text-decoration:none;
+      font-size: 13px;
+    }
+    .btn:hover{ background: var(--panel2); }
+    .btn:active{ transform: translateY(1px); }
+
+    .hero{
+      margin-top: 8px;
+      border:1px solid var(--border);
+      background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px 20px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .hero-top{
+      display:flex;
+      gap:18px;
+      align-items:flex-start;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+
+    .hero h2{
+      margin:0 0 8px;
+      font-size: 30px;
+      letter-spacing:0.2px;
+    }
+    .hero p{
+      margin:0;
+      color: var(--muted);
+      max-width: 780px;
+      font-size: 15px;
+    }
+
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top: 14px;
+    }
+    .chip{
+      font-size: 12px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,0.03);
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    .hero svg.wave{
+      position:absolute;
+      inset:auto 0 -1px 0;
+      width:100%;
+      height:56px;
+      opacity:0.35;
+      pointer-events:none;
+    }
+
+    .toolbar{
+      margin-top: 16px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .search{
+      flex: 1 1 360px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      border:1px solid var(--border);
+      background: var(--panel);
+      border-radius: 14px;
+      padding: 10px 12px;
+    }
+    .search input{
+      width:100%;
+      border:0;
+      outline:0;
+      background: transparent;
+      color: var(--text);
+      font-size: 14px;
+    }
+    .search small{
+      color: var(--muted2);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .grid-cards{
+      margin-top: 18px;
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 12px;
+    }
+
+    .card{
+      grid-column: span 12;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      border-radius: var(--radius);
+      padding: 16px 16px 12px;
+      box-shadow: none;
+      transition: transform 0.12s ease, background 0.2s ease;
+    }
+    .card:hover{ background: var(--panel2); transform: translateY(-1px); }
+
+    @media (min-width: 900px){
+      .card.half{ grid-column: span 6; }
+    }
+
+    .card-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .title-wrap{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+    }
+    .icon{
+      width:38px;height:38px;
+      border-radius: 14px;
+      display:grid;
+      place-items:center;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,0.03);
+    }
+    .icon svg{ opacity:0.9; }
+
+    .card h3{
+      margin:0;
+      font-size: 16px;
+      letter-spacing:0.2px;
+    }
+    .meta{
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .badges{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .badge{
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,0.03);
+      color: var(--muted);
+      white-space:nowrap;
+      font-family: var(--mono);
+    }
+    .badge.ok{ border-color: rgba(56,217,150,0.35); color: rgba(56,217,150,0.92); }
+    .badge.warn{ border-color: rgba(255,206,84,0.35); color: rgba(255,206,84,0.92); }
+
+    details{
+      margin-top: 10px;
+      border-top: 1px solid var(--border);
+      padding-top: 10px;
+    }
+    summary{
+      cursor:pointer;
+      list-style:none;
+      color: var(--muted);
+      font-size: 13px;
+      user-select:none;
+    }
+    summary::-webkit-details-marker{ display:none; }
+    summary .caret{
+      display:inline-block;
+      width: 10px;
+      height: 10px;
+      border-right: 2px solid var(--muted2);
+      border-bottom: 2px solid var(--muted2);
+      transform: rotate(-45deg);
+      margin-right: 8px;
+      transition: transform 0.15s ease;
+      position: relative;
+      top: -1px;
+    }
+    details[open] summary .caret{ transform: rotate(45deg); }
+
+    .content p{
+      margin: 10px 0 10px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .content strong{
+      color: var(--text);
+      font-size: 13px;
+      display:block;
+      margin-top: 10px;
+      margin-bottom: 6px;
+      letter-spacing:0.15px;
+    }
+    .content ul{
+      margin: 0 0 8px 18px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .skills{
+      margin-top: 18px;
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 12px;
+    }
+    .skills .card{ grid-column: span 12; }
+    @media (min-width: 900px){
+      .skills .card{ grid-column: span 6; }
+    }
+
+    footer{
+      margin-top: 22px;
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+      color: var(--muted);
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      font-size: 13px;
+    }
+    footer .links{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    /* Small helper for hiding filtered cards */
+    .hidden{ display:none !important; }
+  </style>
+</head>
+
+<body>
+  <div class="bg-wrap" aria-hidden="true">
+    <div class="grid"></div>
+    <div class="blob one"></div>
+    <div class="blob two"></div>
+  </div>
+
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <!-- tiny circuit-ish icon -->
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+            <path d="M4 7h7m-7 10h7m2-10h7m-7 10h7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M11 7v10M13 7v10" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+            <circle cx="4" cy="7" r="1.6" fill="white"/>
+            <circle cx="20" cy="7" r="1.6" fill="white" opacity="0.95"/>
+            <circle cx="4" cy="17" r="1.6" fill="white" opacity="0.95"/>
+            <circle cx="20" cy="17" r="1.6" fill="white"/>
+          </svg>
+        </div>
+        <div>
+          <h1>Tony Vierra</h1>
+          <p>Electrical Engineering — UCLA</p>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn" id="themeBtn" type="button" aria-label="Toggle dark mode">
+          <span aria-hidden="true">🌓</span> Theme
+        </button>
+        <!-- Replace these with your real links -->
+        <a class="btn" href="https://github.com/yourusername" target="_blank" rel="noreferrer">
+          <span aria-hidden="true">↗</span> GitHub
+        </a>
+        <a class="btn" href="mailto:your.email@ucla.edu">
+          <span aria-hidden="true">✉</span> Email
+        </a>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="hero-top">
+        <div>
+          <h2>Robotics + Embedded Portfolio</h2>
+          <p>
+            I’m an EE student at UCLA who likes building things that actually run on real hardware.
+            I’m currently working on a Jetson-based autonomous follower robot (vision + range sensing),
+            and I’ve done embedded STM32 work, sensor-driven control, and ArduPilot simulation projects.
+          </p>
+
+          <div class="chips" aria-label="focus areas">
+            <span class="chip">embedded linux</span>
+            <span class="chip">jetson orin nano</span>
+            <span class="chip">computer vision</span>
+            <span class="chip">stm32</span>
+            <span class="chip">arduino</span>
+            <span class="chip">ardupilot</span>
+            <span class="chip">python + c/c++</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- subtle wave graphic -->
+      <svg class="wave" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
+        <path fill="white" fill-opacity="0.16"
+          d="M0,96L60,90.7C120,85,240,75,360,58.7C480,43,600,21,720,21.3C840,21,960,43,1080,58.7C1200,75,1320,85,1380,90.7L1440,96L1440,120L1380,120C1320,120,1200,120,1080,120C960,120,840,120,720,120C600,120,480,120,360,120C240,120,120,120,60,120L0,120Z">
+        </path>
+      </svg>
+    </section>
+
+    <div class="toolbar">
+      <div class="search" role="search">
+        <span aria-hidden="true">🔎</span>
+        <input id="searchInput" type="text" placeholder="Search projects (e.g., Jetson, ArduPilot, UART, YOLO)..." />
+        <small id="countLabel">5 projects</small>
+      </div>
+      <button class="btn" id="expandAllBtn" type="button">Expand all</button>
+      <button class="btn" id="collapseAllBtn" type="button">Collapse all</button>
+    </div>
+
+    <section class="grid-cards" id="cards">
+      <!-- Project 1 -->
+      <article class="card" data-keywords="jetson orin nano vision lidar range sensing yolo cnn opencv robotics controls">
+        <div class="card-head">
+          <div class="title-wrap">
+            <div class="icon" aria-hidden="true">
+              <!-- robot icon -->
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M9 3h6v3H9V3Z" stroke="white" stroke-width="1.6"/>
+                <path d="M7 8h10a3 3 0 0 1 3 3v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5v-5a3 3 0 0 1 3-3Z" stroke="white" stroke-width="1.6"/>
+                <path d="M9 13h.01M15 13h.01" stroke="white" stroke-width="3" stroke-linecap="round"/>
+                <path d="M8 8V6h8v2" stroke="white" stroke-width="1.6" opacity="0.9"/>
+              </svg>
+            </div>
+            <div>
+              <h3>Autonomous Follower Vehicle (Jetson, Vision + Range Sensing)</h3>
+              <div class="meta">Building an on-board follower robot using Jetson Orin Nano + Pi Camera + range sensing.</div>
+            </div>
+          </div>
+          <div class="badges">
+            <span class="badge warn">status: in progress</span>
+            <span class="badge">jetson</span>
+            <span class="badge">computer vision</span>
+          </div>
+        </div>
+
+        <details>
+          <summary><span class="caret"></span>Open details</summary>
+          <div class="content">
+            <p>
+              Building an autonomous follower robot around a Jetson Orin Nano that performs vision-based
+              target detection with additional range sensing, fully on-board (no cloud processing).
+            </p>
+
+            <strong>What I have done</strong>
+            <ul>
+              <li>Set up and configured the Jetson Orin Nano as the main compute platform</li>
+              <li>Integrated a Pi Camera and a simple LiDAR / range sensor with the Jetson</li>
+              <li>Verified sensor data availability and system bring-up</li>
+              <li>Currently working on computer vision model selection and real-time inference</li>
+            </ul>
+
+            <strong>Technical focus</strong>
+            <ul>
+              <li>Evaluating lightweight CNN-based object detectors (YOLO-style models) for edge inference</li>
+              <li>Designing a perception pipeline that outputs target position and distance in real time</li>
+              <li>Planning control logic that maps image error to steering and distance error to speed</li>
+            </ul>
+
+            <strong>Planned next steps</strong>
+            <ul>
+              <li>Integrate perception outputs into closed-loop motor control</li>
+              <li>Tune control behavior with respect to camera latency and embedded compute constraints</li>
+              <li>Implement proper power separation between motors and compute during full system integration</li>
+            </ul>
+          </div>
+        </details>
+      </article>
+
+      <!-- Project 2 -->
+      <article class="card half" data-keywords="stm32 embedded uart timers interrupts pwm motor control c c++ debugging oscilloscope network analyzer">
+        <div class="card-head">
+          <div class="title-wrap">
+            <div class="icon" aria-hidden="true">
+              <!-- chip icon -->
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M7 7h10v10H7V7Z" stroke="white" stroke-width="1.6"/>
+                <path d="M9 9h6v6H9V9Z" stroke="white" stroke-width="1.2" opacity="0.9"/>
+                <path d="M4 9h3M4 15h3M17 9h3M17 15h3M9 4v3M15 4v3M9 17v3M15 17v3" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div>
+              <h3>Embedded Microcontroller Systems (STM32)</h3>
+              <div class="meta">UART comms, timers/interrupts, PWM motor control, low-level debugging.</div>
+            </div>
+          </div>
+          <div class="badges">
+            <span class="badge">stm32</span>
+            <span class="badge">uart</span>
+            <span class="badge">c/c++</span>
+          </div>
+        </div>
+
+        <details>
+          <summary><span class="caret"></span>Open details</summary>
+          <div class="content">
+            <p>
+              Worked on multiple STM32-based embedded systems with an emphasis on timing, communication
+              reliability, and low-level debugging.
+            </p>
+
+            <strong>What I worked on</strong>
+            <ul>
+              <li>UART-based communication between microcontrollers and peripherals</li>
+              <li>Configuration of clocks, timers, and interrupts</li>
+              <li>PWM control for motors and actuators</li>
+              <li>Embedded C/C++ firmware development</li>
+            </ul>
+
+            <strong>Debugging experience</strong>
+            <ul>
+              <li>Serial output for firmware debugging</li>
+              <li>Oscilloscope-based signal inspection</li>
+              <li>Network analyzer usage for signal and frequency-domain investigation</li>
+              <li>Debugged baud rate mismatches, unstable data, and timing-related communication issues</li>
+            </ul>
+          </div>
+        </details>
+      </article>
+
+      <!-- Project 3 -->
+      <article class="card half" data-keywords="arduino ir sensors line following control thresholding robotics ti ece3">
+        <div class="card-head">
+          <div class="title-wrap">
+            <div class="icon" aria-hidden="true">
+              <!-- track icon -->
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M7 3c-2 2-2 16 0 18M17 3c2 2 2 16 0 18" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+                <path d="M12 4v2M12 8v2M12 12v2M12 16v2M12 20v0" stroke="white" stroke-width="1.6" stroke-linecap="round" opacity="0.85"/>
+              </svg>
+            </div>
+            <div>
+              <h3>TI / ECE 3 Line-Following Car</h3>
+              <div class="meta">Arduino control logic using IR sensors + thresholding on a black-line track.</div>
+            </div>
+          </div>
+          <div class="badges">
+            <span class="badge">arduino</span>
+            <span class="badge">IR sensors</span>
+            <span class="badge">controls</span>
+          </div>
+        </div>
+
+        <details>
+          <summary><span class="caret"></span>Open details</summary>
+          <div class="content">
+            <p>
+              Implemented sensing and control logic for a line-following robot using IR sensors and
+              Arduino-based firmware.
+            </p>
+            <ul>
+              <li>Wrote Arduino code to follow a black-line track</li>
+              <li>Used IR sensors to distinguish black vs white surfaces</li>
+              <li>Implemented threshold-based detection to determine line position</li>
+              <li>Tested and tuned logic to maintain stable line tracking</li>
+            </ul>
+          </div>
+        </details>
+      </article>
+
+      <!-- Project 4 -->
+      <article class="card" data-keywords="ardupilot drone following simulation docker jetson orin nano perception speed estimation hackathon">
+        <div class="card-head">
+          <div class="title-wrap">
+            <div class="icon" aria-hidden="true">
+              <!-- drone icon -->
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M7 7l3 3M17 7l-3 3M7 17l3-3M17 17l-3-3" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+                <path d="M12 9v6" stroke="white" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/>
+                <path d="M10 12h4" stroke="white" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/>
+                <circle cx="7" cy="7" r="2" stroke="white" stroke-width="1.4"/>
+                <circle cx="17" cy="7" r="2" stroke="white" stroke-width="1.4"/>
+                <circle cx="7" cy="17" r="2" stroke="white" stroke-width="1.4"/>
+                <circle cx="17" cy="17" r="2" stroke="white" stroke-width="1.4"/>
+              </svg>
+            </div>
+            <div>
+              <h3>Flyby Robotics Hackathon — Drone Following (ArduPilot Simulation)</h3>
+              <div class="meta">ArduPilot + Docker on Jetson; simulated target vehicle; extracted motion/detection metrics.</div>
+            </div>
+          </div>
+          <div class="badges">
+            <span class="badge">ardupilot</span>
+            <span class="badge">simulation</span>
+            <span class="badge">docker</span>
+          </div>
+        </div>
+
+        <details>
+          <summary><span class="caret"></span>Open details</summary>
+          <div class="content">
+            <p>
+              Worked on a drone-following autonomy concept using ArduPilot in a simulated environment.
+            </p>
+
+            <strong>What we built</strong>
+            <ul>
+              <li>Worked inside ArduPilot using a Docker-based environment on a Jetson Orin Nano</li>
+              <li>Introduced a simulated ground vehicle with randomized speed and direction</li>
+              <li>Extracted relative motion and detection data from the ArduPilot simulation</li>
+            </ul>
+
+            <strong>Scope and limitations</strong>
+            <ul>
+              <li>Focused on perception and relative speed/position estimation</li>
+              <li>No physical drone hardware or external flight connections</li>
+              <li>Control outputs remained within the ArduPilot simulation environment</li>
+            </ul>
+          </div>
+        </details>
+      </article>
+
+      <!-- Project 5 -->
+      <article class="card" data-keywords="openhands anthropic python agents automation github repositories tooling pipeline">
+        <div class="card-head">
+          <div class="title-wrap">
+            <div class="icon" aria-hidden="true">
+              <!-- bot/automation icon -->
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M9 3h6v2H9V3Z" fill="white" opacity="0.9"/>
+                <path d="M7 8h10a3 3 0 0 1 3 3v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-6a3 3 0 0 1 3-3Z" stroke="white" stroke-width="1.6"/>
+                <path d="M9 13h.01M15 13h.01" stroke="white" stroke-width="3" stroke-linecap="round"/>
+                <path d="M9 17h6" stroke="white" stroke-width="1.6" stroke-linecap="round" opacity="0.85"/>
+              </svg>
+            </div>
+            <div>
+              <h3>LLM-Assisted Engineering Tooling</h3>
+              <div class="meta">Python pipelines + OpenHands + Anthropic API to automate repo exploration with agents.</div>
+            </div>
+          </div>
+          <div class="badges">
+            <span class="badge">python</span>
+            <span class="badge">openhands</span>
+            <span class="badge">automation</span>
+          </div>
+        </div>
+
+        <details>
+          <summary><span class="caret"></span>Open details</summary>
+          <div class="content">
+            <p>
+              Built small Python-based pipelines using OpenHands and the Anthropic API to automate
+              exploration of technical GitHub repositories.
+            </p>
+
+            <strong>What I did</strong>
+            <ul>
+              <li>Created AI agents to sift through repositories from different institutions</li>
+              <li>Used OpenHands with the Anthropic API to manage and run agents</li>
+              <li>Focused on automation and repeatable evaluation workflows</li>
+            </ul>
+          </div>
+        </details>
+      </article>
+    </section>
+
+    <section class="skills">
+      <div class="card">
+        <div class="card-head">
+          <div class="title-wrap">
+            <div class="icon" aria-hidden="true">
+              <!-- wrench icon -->
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M21 7a5 5 0 0 1-7 4L8 17l-2 2-3-3 2-2 6-6a5 5 0 0 1 4-7l-2 4 4 4 4-2Z" stroke="white" stroke-width="1.6" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div>
+              <h3>Skills</h3>
+              <div class="meta">Quick snapshot</div>
+            </div>
+          </div>
+        </div>
+
+        <details open>
+          <summary><span class="caret"></span>Show</summary>
+          <div class="content">
+            <strong>Hardware / Embedded</strong>
+            <ul>
+              <li>Embedded Linux (Jetson platforms)</li>
+              <li>STM32 microcontrollers</li>
+              <li>UART communication</li>
+              <li>Motor and actuator control</li>
+              <li>Sensor integration (camera, IR, range sensors)</li>
+            </ul>
+
+            <strong>Software</strong>
+            <ul>
+              <li>C / C++</li>
+              <li>Python</li>
+              <li>Arduino</li>
+              <li>OpenCV</li>
+              <li>Robotics simulation (ArduPilot)</li>
+            </ul>
+          </div>
+        </details>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="title-wrap">
+            <div class="icon" aria-hidden="true">
+              <!-- link icon -->
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M10 14a4 4 0 0 1 0-6l1-1a4 4 0 0 1 6 6l-1 1" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+                <path d="M14 10a4 4 0 0 1 0 6l-1 1a4 4 0 0 1-6-6l1-1" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div>
+              <h3>Links</h3>
+              <div class="meta">Update these with your real info</div>
+            </div>
+          </div>
+        </div>
+
+        <details open>
+          <summary><span class="caret"></span>Show</summary>
+          <div class="content">
+            <ul>
+              <li><strong>Email:</strong> <a href="mailto:your.email@ucla.edu">your.email@ucla.edu</a></li>
+              <li><strong>GitHub:</strong> <a href="https://github.com/yourusername" target="_blank" rel="noreferrer">github.com/yourusername</a></li>
+              <li><strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/yourusername/" target="_blank" rel="noreferrer">linkedin.com/in/yourusername</a></li>
+            </ul>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <footer>
+      <div>
+        <strong>Last updated:</strong> <span id="lastUpdated">today</span><br/>
+        <span style="font-family:var(--mono);">Built as a single-file GitHub Pages site.</span>
+      </div>
+      <div class="links">
+        <a class="btn" href="#top" onclick="window.scrollTo({top:0, behavior:'smooth'}); return false;">Back to top</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Theme toggle (persists)
+    const root = document.documentElement;
+    const themeBtn = document.getElementById('themeBtn');
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) root.setAttribute('data-theme', savedTheme);
+
+    themeBtn.addEventListener('click', () => {
+      const cur = root.getAttribute('data-theme') || 'dark';
+      const next = cur === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    });
+
+    // Search filter
+    const searchInput = document.getElementById('searchInput');
+    const cards = Array.from(document.querySelectorAll('#cards .card'));
+    const countLabel = document.getElementById('countLabel');
+
+    function updateCount(){
+      const visible = cards.filter(c => !c.classList.contains('hidden')).length;
+      countLabel.textContent = `${visible} project${visible === 1 ? '' : 's'}`;
+    }
+
+    function filterCards(){
+      const q = (searchInput.value || '').trim().toLowerCase();
+      cards.forEach(card => {
+        const hay = (card.getAttribute('data-keywords') || '') + ' ' + card.innerText;
+        const match = hay.toLowerCase().includes(q);
+        card.classList.toggle('hidden', q && !match);
+      });
+      updateCount();
+    }
+    searchInput.addEventListener('input', filterCards);
+    updateCount();
+
+    // Expand/collapse all
+    const expandAllBtn = document.getElementById('expandAllBtn');
+    const collapseAllBtn = document.getElementById('collapseAllBtn');
+    const allDetails = () => Array.from(document.querySelectorAll('#cards details'));
+
+    expandAllBtn.addEventListener('click', () => {
+      allDetails().forEach(d => d.open = true);
+    });
+    collapseAllBtn.addEventListener('click', () => {
+      allDetails().forEach(d => d.open = false);
+    });
+
+    // Last updated
+    const lastUpdated = document.getElementById('lastUpdated');
+    const d = new Date();
+    lastUpdated.textContent = d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+  </script>
+</body>
+</html>
